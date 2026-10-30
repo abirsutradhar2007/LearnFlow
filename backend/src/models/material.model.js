@@ -1,40 +1,28 @@
 import mongoose from 'mongoose';
 
-const materialSchema = new mongoose.Schema({
-  videoUrl: {
-    type: String,
-    required: true
-  },
-  title: {
-    type: String,
-    required: true
-  },
+const learningMaterialSchema = new mongoose.Schema({
   summary: {
     type: String,
     required: true
   },
-  notes: {
-    type: String,
-    required: true
-  },
-  flashcards: {
-    type: [String],
-    required: true
-  },
+  notes: [{
+    title: { type: String, required: true },
+    content: { type: String, required: true }
+  }],
+  flashcards: [{
+    question: { type: String, required: true },
+    answer: { type: String, required: true }
+  }],
   quiz: [{
-    question: {
-      type: String,
-      required: true
-    },
-    options: {
-      type: [String],
-      required: true
-    },
-    correctAnswerIndex: {
-      type: Number,
-      required: true
-    }
+    question: { type: String, required: true },
+    options: [{ type: String, required: true }],
+    correctAnswerIndex: { type: Number, required: true, min: 0 },
+    explanation: { type: String, required: true }
   }]
-}, { timestamps: true });
+}, {
+  timestamps: true
+});
 
-const Material = mongoose.model('Material', materialSchema);
+const LearningMaterial = mongoose.model('LearningMaterial', learningMaterialSchema);
+
+export default LearningMaterial;
