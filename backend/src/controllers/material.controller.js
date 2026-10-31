@@ -7,7 +7,7 @@ import asyncHandler from "../utils/asyncHandler.util.js";
 
 
 
-const generateMaterials = asyncHandler(async (req, res) => {
+export const generateMaterials = asyncHandler(async (req, res) => {
 
     // STEP 1: Get YouTube URL
     const { youtubeUrl } = req.body;
@@ -122,4 +122,45 @@ const generateMaterials = asyncHandler(async (req, res) => {
 
 });
 
-export default generateMaterials;
+export const getAllMaterials = asyncHandler(async (req, res) => {
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(50, Math.max(1, parseInt(req.query.limit) || 10));
+
+    const skip = (page - 1) * limit;
+
+    const [materials, totalMaterials] = await Promise.all([
+        Material.find()
+            .select("videoId title")
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit),
+
+        Material.countDocuments()
+    ]);
+
+    return res.status(200).json({
+        success: true,
+        data: materials,
+        pagination: {
+            currentPage: page,
+            totalPages: Math.ceil(totalMaterials / limit),
+            totalMaterials,
+            limit
+        }
+    });
+});
+
+export const getMaterialByVideoId = asyncHandler(async (req, res) => {
+    const { videoId } = req.params;
+
+    const material = await Material.findOne({ videoId });
+
+    if (!material) {
+        throw new ApiError(404, "Learning material not found");
+    }
+
+    return res.status(200).json({
+        success: true,
+        data: material
+    });
+});

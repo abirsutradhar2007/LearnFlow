@@ -1,9 +1,13 @@
-
 import express from "express";
-import generateMaterials from "../controllers/material.controller.js";
+import { getAllMaterials, getMaterialByVideoId, generateMaterials } from "../controllers/material.controller.js";
+
 
 const materialRouter = express.Router();
 
 materialRouter.post("/", generateMaterials);
+
+materialRouter.get("/", getAllMaterials);
+
+materialRouter.get("/:videoId", getMaterialByVideoId);
 
 export default materialRouter;

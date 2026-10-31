@@ -42,7 +42,7 @@ Write a concise but informative overview of the video.
 Provide a clear , concise, and brief title for the learning materials.
 
 3. NOTES:
-Create organized notes covering the main concepts.
+Create organized (some detailed point if needed for long transcripts) notes covering the main concepts.
 Each note must have a title and explanatory content.
 
 4. FLASHCARDS:
