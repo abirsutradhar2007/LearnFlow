@@ -1,6 +1,19 @@
 import mongoose from 'mongoose';
 
 const learningMaterialSchema = new mongoose.Schema({
+  videoId: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  videoUrl: {
+    type: String,
+    required: true
+  },
+  title: {
+    type: String,
+    required: true
+  },
   summary: {
     type: String,
     required: true

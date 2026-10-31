@@ -1,4 +1,7 @@
-import { fetchTranscript } from "youtube-transcript";
+import {
+    fetchTranscript,
+    YoutubeTranscriptNotAvailableLanguageError
+} from "youtube-transcript";
 
 // const { YoutubeTranscript } = require("youtube-transcript");
 
@@ -11,10 +14,23 @@ export const getTranscript = async (videoId, language = "en") => {
         throw new Error("Invalid YouTube video ID");
     }
 
-    const transcript = await fetchTranscript(videoId, { lang: language }).catch((error) => {
-        console.error("Error fetching transcript:", error);
-        throw new Error("Failed to fetch transcript");
-    });
+    let transcript;
+
+    try {
+        transcript = await fetchTranscript(videoId, { lang: language });
+    } catch (error) {
+        if (language !== "en" || !(error instanceof YoutubeTranscriptNotAvailableLanguageError)) {
+            console.error("Error fetching transcript:", error);
+            throw new Error("Failed to fetch transcript");
+        }
+
+        try {
+            transcript = await fetchTranscript(videoId);
+        } catch (fallbackError) {
+            console.error("Error fetching default transcript:", fallbackError);
+            throw new Error("Failed to fetch transcript");
+        }
+    }
 
     if (!Array.isArray(transcript) || transcript.length === 0) {
         throw new Error("Transcript is unavailable for this video");
@@ -31,4 +47,3 @@ export const getTranscript = async (videoId, language = "en") => {
 
     return transcriptText;
 };
-

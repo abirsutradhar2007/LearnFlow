@@ -38,21 +38,25 @@ Create the following learning materials:
 1. SUMMARY:
 Write a concise but informative overview of the video.
 
-2. NOTES:
+2. TITLE:
+Provide a clear , concise, and brief title for the learning materials.
+
+3. NOTES:
 Create organized notes covering the main concepts.
 Each note must have a title and explanatory content.
 
-3. FLASHCARDS:
+4. FLASHCARDS:
 Create useful question-and-answer flashcards for revision.
 
-4. QUIZ:
+5. QUIZ:
 Create multiple-choice questions.
 Each question must have four options, one correct answer,
 and a short explanation.
 
 Return JSON using exactly this structure:
 
-{
+{       
+    "title": "Title text",
     "summary": "Summary text",
     "notes": [
         {

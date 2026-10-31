@@ -1,4 +1,4 @@
-const extractYouTubeVideoId = (url) => {
+export const extractYouTubeVideoId = (url) => {
     if (typeof url !== "string" || !url.trim()) {
         throw new Error("YouTube URL is required");
     }
@@ -77,4 +77,4 @@ const extractYouTubeVideoId = (url) => {
     return videoId;
 };
 
-export default extractYouTubeVideoId;
+// export default extractYouTubeVideoId;
