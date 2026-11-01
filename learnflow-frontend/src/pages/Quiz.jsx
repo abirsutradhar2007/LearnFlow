@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { getMaterialById } from "../services/material.service.js";
 
+const getCorrectAnswer = (question) =>
+  question.options?.[question.correctAnswerIndex];
+
 function Quiz() {
   const { videoId } = useParams();
 
@@ -50,7 +53,10 @@ function Quiz() {
   // Calculate score
   const score = questions.reduce((total, question, index) => {
     return total + (
-      answers[index] === question.correctAnswer ? 1 : 0
+      answers[index] !== undefined &&
+      answers[index] === getCorrectAnswer(question)
+        ? 1
+        : 0
     );
   }, 0);
 
@@ -244,7 +250,8 @@ function Quiz() {
             <div className="space-y-4">
               {questions.map((question, index) => {
                 const isCorrect =
-                  answers[index] === question.correctAnswer;
+                  answers[index] !== undefined &&
+                  answers[index] === getCorrectAnswer(question);
 
                 return (
                   <div
@@ -270,7 +277,7 @@ function Quiz() {
                     </p>
 
                     <p className="mt-2 text-sm text-green-400">
-                      Correct answer: {question.correctAnswer}
+                      Correct answer: {getCorrectAnswer(question) ?? "Unavailable"}
                     </p>
 
                     {question.explanation && (

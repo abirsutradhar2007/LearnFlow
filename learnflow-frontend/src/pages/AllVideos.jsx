@@ -59,7 +59,7 @@ function AllVideos() {
           </p>
 
           <h1 className="text-3xl font-bold sm:text-5xl">
-            All Your <span className="text-violet-400">Videos</span>
+            All Your <span className="text-violet-400">Materials</span>
           </h1>
 
           <p className="mt-4 max-w-xl text-gray-400">
@@ -72,7 +72,7 @@ function AllVideos() {
         {loading && (
           <div className="py-24 text-center">
             <div className="mx-auto mb-5 h-10 w-10 animate-spin rounded-full border-4 border-violet-500/20 border-t-violet-500" />
-            <p className="text-gray-400">Loading your videos...</p>
+            <p className="text-gray-400">Loading your materials...</p>
           </div>
         )}
 
