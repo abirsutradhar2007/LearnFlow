@@ -1,88 +1,176 @@
-# LearnFlow 🚀
+# LearnFlow
 
-**Turn YouTube videos into structured learning materials with AI.**
+LearnFlow turns a YouTube video into a personal study set. It extracts the
+video transcript, sends the transcript to Google Gemini, and creates:
 
-LearnFlow is a MERN stack application that converts YouTube videos into summaries, detailed notes, flashcards, and interactive quizzes.
+- A concise summary
+- Structured study notes
+- Flashcards
+- A multiple-choice quiz
+- A video category
 
-## ✨ Features
+Generated materials are cached by user and video ID in MongoDB. Users can
+browse their saved videos, open materials again, and submit quiz scores.
 
-- AI-powered video summaries and notes.
-- Automatic flashcard and quiz generation.
-- YouTube transcript extraction.
-- Smart caching to avoid repeated AI API calls.
-- Browse previously generated materials.
-- Paginated video library.
-- Interactive quizzes with instant score calculation.
+## Features
 
-## 🛠️ Tech Stack
+- Account registration and login
+- HTTP-only access and refresh cookies
+- YouTube transcript extraction
+- AI-generated summaries, notes, flashcards, and quizzes
+- Per-user material caching
+- Paginated material library
+- Quiz score calculation and profile statistics
+- Protected React routes
 
-- **Frontend:** React.js, React Router, Tailwind CSS
-- **Backend:** Node.js, Express.js
-- **Database:** MongoDB, Mongoose
-- **AI:** Gemini API
-- **Transcript:** YouTube transcript extraction package
+## Tech Stack
 
-## ⚙️ Installation
+| Layer | Technology |
+|---|---|
+| Frontend | React 19, React Router 7, Vite 8, Tailwind CSS 4 |
+| Backend | Node.js, Express 5 |
+| Database | MongoDB, Mongoose |
+| Authentication | JSON Web Tokens, HTTP-only cookies |
+| AI | Google Gemini via `@google/genai` |
+| Transcripts | `youtube-transcript` |
 
-**1. Clone the repository**
+## Project Structure
+
+```text
+LearnFlow/
+├── backend/
+│   └── src/
+│       ├── config/
+│       ├── controllers/
+│       ├── middleware/
+│       ├── models/
+│       ├── routes/
+│       ├── services/
+│       └── utils/
+└── learnflow-frontend/
+    └── src/
+        ├── components/
+        ├── context/
+        ├── layouts/
+        ├── pages/
+        └── services/
+```
+
+## Prerequisites
+
+- Node.js 20 or later
+- npm
+- A MongoDB database
+- A Google Gemini API key
+
+## Getting Started
+
+Clone the repository and enter the project directory:
 
 ```bash
-git clone YOUR_REPOSITORY_URL
+git clone https://github.com/abirsutradhar2007/LearnFlow.git
 cd LearnFlow
 ```
 
-**2. Setup Backend**
+### 1. Configure the backend
 
 ```bash
 cd backend
 npm install
 ```
 
-Create a `.env` file:
+Create `backend/.env` with the following variables:
 
 ```env
 PORT=3000
+NODE_ENV=development
 MONGODB_URI=your_mongodb_connection_string
-CORS_ORIGIN=http://localhost:5173
+
 GEMINI_API_KEY=your_gemini_api_key
+GEMINI_MODEL=your_gemini_model_name
+
+ACCESS_TOKEN_SECRET=use_a_long_random_secret
+REFRESH_TOKEN_SECRET=use_a_different_long_random_secret
 ```
 
-Start the backend:
+Generate suitable secrets in PowerShell:
+
+```powershell
+node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+```
+
+Run that command twice and use the results for the access and refresh secrets.
+
+Start the API:
 
 ```bash
-npm run dev
+npm start
 ```
 
-**3. Setup Frontend**
+### 2. Configure the frontend
+
+Open a second terminal from the project root:
 
 ```bash
 cd learnflow-frontend
 npm install
 ```
 
-Create a `.env` file:
+Create `learnflow-frontend/.env`:
 
 ```env
-VITE_API_URL=http://localhost:3000/api/v1
+VITE_API_URL=your_backend_api_url
 ```
 
-Start the frontend:
+Start the Vite development server:
 
 ```bash
 npm run dev
 ```
 
-## 🔌 API Endpoints
+## Available Scripts
+
+### Backend
+
+| Command | Description |
+|---|---|
+| `npm start` | Start the API server |
+
+### Frontend
+
+| Command | Description |
+|---|---|
+| `npm run dev` | Start the Vite development server |
+| `npm run build` | Create a production build |
+| `npm run preview` | Preview the production build locally |
+| `npm run lint` | Run ESLint |
+
+## API Overview
 
 Base URL: `/api/v1`
+
+### Authentication
+
+| Method | Endpoint | Authentication | Description |
+|---|---|---|---|
+| POST | `/users/register` | No | Create an account |
+| POST | `/users/login` | No | Log in and set cookies |
+| POST | `/users/refresh` | Refresh cookie | Refresh the access token |
+| POST | `/users/logout` | No | Revoke the refresh token and clear cookies |
+| GET | `/users/profile` | Access cookie | Get profile and activity |
+| POST | `/users/submitQuiz` | Access cookie | Submit a quiz percentage |
+
+### Materials
+
+All material endpoints require the access cookie.
 
 | Method | Endpoint | Description |
 |---|---|---|
 | POST | `/materials` | Generate or retrieve cached materials |
-| GET | `/materials` | Get all materials with pagination |
-| GET | `/materials/:videoId` | Get materials by video ID |
+| GET | `/materials?page=1&limit=10` | List the user's materials |
+| GET | `/materials/:videoId` | Get a material by YouTube video ID |
 
-**Example request:**
+Generate materials with a JSON request body:
 
 ```json
 {
@@ -90,8 +178,11 @@ Base URL: `/api/v1`
 }
 ```
 
+## Production Notes
 
-
----
-
-⭐ If you find LearnFlow useful, consider giving it a star!
+- Set `NODE_ENV=production` so authentication cookies use `secure: true`.
+- Configure HTTPS and use a frontend/backend deployment setup that is compatible
+  with the cookie `sameSite: "lax"` setting.
+- Keep `ACCESS_TOKEN_SECRET` and `REFRESH_TOKEN_SECRET` private and unique.
+- The frontend API URL must include the `/api/v1` suffix.
+- Videos without an accessible transcript cannot be converted into materials.
