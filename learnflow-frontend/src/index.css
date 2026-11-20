@@ -4,8 +4,123 @@
   box-sizing: border-box;
 }
 
+html {
+  color-scheme: light;
+}
+
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  background: #fffdf2;
+  color: #201f1a;
+  font-family: Inter, "DM Sans", Manrope, "Segoe UI", sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+.app-page {
+  background-color: #f7f5eb;
+  color: #201f1a;
+}
+
+.app-page [class~="bg-[#070710]"] {
+  background-color: #f7f5eb !important;
+}
+
+.app-page [class~="bg-black"] {
+  background-color: #eeece3 !important;
+  color: #201f1a;
+}
+
+.app-page [class*="bg-white/"],
+.app-page [class*="bg-violet-"],
+.app-page [class*="bg-indigo-"],
+.app-page [class*="bg-blue-"],
+.app-page [class*="bg-fuchsia-"] {
+  background-color: #efede4 !important;
+}
+
+.app-page [class*="bg-gradient"] {
+  background-color: #efede4 !important;
+  background-image: none !important;
+}
+
+.app-page button[class~="bg-violet-600"],
+.app-page a[class~="bg-violet-600"],
+.app-page button[class*="bg-gradient"],
+.app-page a[class*="bg-gradient"] {
+  background-color: #201f1a !important;
+  color: #fffdf2 !important;
+}
+
+.app-page [class~="text-white"] {
+  color: #201f1a !important;
+}
+
+.app-page [class*="text-gray-"] {
+  color: #656258 !important;
+}
+
+.app-page [class*="text-violet-"],
+.app-page [class*="text-indigo-"],
+.app-page [class*="text-blue-"],
+.app-page [class*="text-fuchsia-"] {
+  color: #38372f !important;
+}
+
+.app-page [class*="border-white/"],
+.app-page [class*="border-violet-"],
+.app-page [class*="border-indigo-"],
+.app-page [class*="border-blue-"],
+.app-page [class*="border-fuchsia-"] {
+  border-color: rgb(32 31 26 / 12%) !important;
+}
+
+.app-page [class*="hover:bg-violet-"]:hover,
+.app-page [class*="hover:bg-indigo-"]:hover,
+.app-page [class*="hover:bg-blue-"]:hover,
+.app-page [class*="hover:bg-fuchsia-"]:hover,
+.app-page [class*="hover:bg-white/"]:hover {
+  background-color: #e9e6db !important;
+}
+
+.app-page [class*="rounded-3xl"],
+.app-page [class*="rounded-2xl"] {
+  border-radius: 0.5rem !important;
+}
+
+.app-page [class*="blur-"] {
+  opacity: 0.12;
+}
+
+@keyframes landing-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.landing-reveal {
+  animation: landing-rise 650ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.landing-reveal-delay {
+  animation-delay: 120ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .landing-reveal {
+    animation: none;
+  }
 }

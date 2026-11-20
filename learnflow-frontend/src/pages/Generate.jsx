@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { Sparkle, WarningCircle } from "@phosphor-icons/react";
 import { generateMaterials } from "../services/material.service.js";
 
 function Generate() {
@@ -57,7 +58,7 @@ function Generate() {
   // Loading screen
   if (status === "loading") {
     return (
-      <div className="relative flex min-h-[75vh] items-center justify-center overflow-hidden px-6">
+      <div className="app-page relative flex min-h-[75vh] items-center justify-center overflow-hidden px-6">
 
         {/* Background glow */}
         <div className="pointer-events-none absolute left-1/2 top-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full bg-violet-600/15 blur-[100px]" />
@@ -72,7 +73,7 @@ function Generate() {
             <div className="absolute inset-3 animate-[spin_3s_linear_infinite_reverse] rounded-full border-2 border-transparent border-b-fuchsia-500 border-l-blue-500" />
 
             <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-violet-500/10 text-3xl text-violet-400 shadow-lg shadow-violet-500/20">
-              ✦
+              <Sparkle size={30} weight="duotone" aria-hidden="true" />
             </div>
 
           </div>
@@ -81,14 +82,14 @@ function Generate() {
             LearnFlow AI
           </p>
 
-          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-            Creating your
+          <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+            Creating your learning materials
             <span className="block bg-gradient-to-r from-violet-400 to-blue-400 bg-clip-text text-transparent">
-              learning experience
+              
             </span>
           </h1>
 
-          <p className="mx-auto mt-5 max-w-sm text-sm leading-7 text-gray-400">
+          <p className="mx-auto mt-5 max-w-sm text-sm leading-7 text-gray-900">
             We're processing your video and preparing your personalized
             learning materials. This may take a moment.
           </p>
@@ -112,12 +113,12 @@ function Generate() {
   // Error screen
   if (status === "error") {
     return (
-      <div className="flex min-h-[75vh] items-center justify-center px-6">
+      <div className="app-page flex min-h-[75vh] items-center justify-center px-6">
 
         <div className="w-full max-w-md rounded-3xl border border-red-500/20 bg-white/[0.03] p-8 text-center">
 
           <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-red-500/10 text-3xl text-red-400">
-            !
+            <WarningCircle size={32} weight="regular" aria-hidden="true" />
           </div>
 
           <h1 className="text-2xl font-bold">
@@ -144,7 +145,7 @@ function Generate() {
                   },
                 });
               }}
-              className="rounded-xl bg-violet-600 px-6 py-3 text-sm font-semibold transition hover:bg-violet-500"
+              className="inline-flex items-center justify-center gap-2 bg-[#201F1A] px-5 py-3 text-sm font-medium text-[#FFFDF2] transition hover:bg-black/80"
             >
               Try Again
             </button>

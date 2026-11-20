@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { ArrowRight, Play } from "@phosphor-icons/react";
 import { getAllMaterials } from "../services/material.service.js";
 
 const LIMIT = 10;
@@ -20,16 +21,14 @@ function AllVideos() {
         setLoading(true);
         setError("");
 
-        const data = await getAllMaterials(page, LIMIT);
-
-        // Supports either a direct array or a paginated response.
-        const videoList = Array.isArray(data)
-          ? data
-          : data.materials || data.docs || [];
+        const { materials: videoList, pagination } = await getAllMaterials(
+          page,
+          LIMIT
+        );
 
         if (isMounted) {
           setVideos(videoList);
-          setHasMore(videoList.length === LIMIT);
+          setHasMore(pagination.currentPage < pagination.totalPages);
         }
       } catch (err) {
         if (isMounted) {
@@ -50,7 +49,7 @@ function AllVideos() {
   }, [page, refresh]);
 
   return (
-    <section className="min-h-screen bg-[#070710] px-5 py-16 text-white sm:px-8">
+    <section className="app-page min-h-screen px-5 py-14 sm:px-8 sm:py-16">
       <div className="mx-auto max-w-6xl">
         {/* Header */}
         <div className="mb-12">
@@ -58,7 +57,7 @@ function AllVideos() {
             Your Learning Library
           </p>
 
-          <h1 className="text-3xl font-bold sm:text-5xl">
+          <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
             All Your <span className="text-violet-400">Materials</span>
           </h1>
 
@@ -81,7 +80,7 @@ function AllVideos() {
           <div className="rounded-2xl border border-red-500/20 bg-red-500/5 p-8 text-center">
             <p className="mb-4 text-red-400">{error}</p>
             <button
-              onClick={() => setPage((current) => current)}
+              onClick={() => setRefresh((current) => current + 1)}
               className="rounded-lg bg-violet-600 px-5 py-2 font-medium hover:bg-violet-500"
             >
               Try Again
@@ -101,7 +100,7 @@ function AllVideos() {
 
             <Link
               to="/generate"
-              className="inline-block rounded-xl bg-violet-600 px-6 py-3 font-semibold transition hover:bg-violet-500"
+              className="inline-flex items-center justify-center gap-2 bg-[#201F1A] px-5 py-3 text-sm font-medium text-[#FFFDF2] transition hover:bg-black/80"
             >
               Generate Materials
             </Link>
@@ -119,30 +118,22 @@ function AllVideos() {
                   className="group rounded-2xl border border-white/10 bg-white/[0.03] p-6 transition duration-300 hover:-translate-y-1 hover:border-violet-500/50 hover:bg-violet-500/[0.05]"
                 >
                   <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-violet-500/10 text-violet-400">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="m10 8 6 4-6 4V8Z" />
-                      <rect x="3" y="4" width="18" height="16" rx="3" />
-                    </svg>
+                    <Play size={22} weight="fill" aria-hidden="true" />
                   </div>
 
                   <h2 className="mb-4 line-clamp-2 text-lg font-semibold transition group-hover:text-violet-300">
                     {video.title}
                   </h2>
 
+                  {video.genre && (
+                    <p className="mb-4 text-sm text-gray-500">{video.genre}</p>
+                  )}
+
                   <div className="flex items-center justify-between">
                   
-                    <span className="text-sm font-medium text-violet-400">
-                      View materials →
+                    <span className="inline-flex items-center gap-1 text-sm font-medium text-violet-400">
+                      View materials
+                      <ArrowRight size={16} aria-hidden="true" />
                     </span>
                   </div>
                 </Link>

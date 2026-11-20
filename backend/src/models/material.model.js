@@ -1,10 +1,24 @@
 import mongoose from 'mongoose';
 
+export const genreOptions = [
+  "Computer Science",
+  "Science",
+  "Mathematics",
+  "Economics & Finance",
+  "History & Geography",
+  "Psychology & Philosophy"
+];
+
+
 const learningMaterialSchema = new mongoose.Schema({
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
   videoId: {
     type: String,
-    required: true,
-    unique: true
+    required: true
   },
   videoUrl: {
     type: String,
@@ -31,10 +45,17 @@ const learningMaterialSchema = new mongoose.Schema({
     options: [{ type: String, required: true }],
     correctAnswerIndex: { type: Number, required: true, min: 0 },
     explanation: { type: String, required: true }
-  }]
+  }],
+  genre: {
+    type: String,
+    enum: genreOptions,
+    required: true
+  },
 }, {
   timestamps: true
 });
+
+learningMaterialSchema.index({ user: 1, videoId: 1 }, { unique: true });
 
 const LearningMaterial = mongoose.model('LearningMaterial', learningMaterialSchema);
 

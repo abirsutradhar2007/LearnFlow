@@ -1,5 +1,14 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Cards,
+  Lightning,
+  NotePencil,
+  Sparkle,
+  WarningCircle,
+} from "@phosphor-icons/react";
 import { getMaterialById } from "../services/material.service.js";
 
 function Material() {
@@ -47,7 +56,7 @@ function Material() {
   // Loading state
   if (loading) {
     return (
-      <div className="flex min-h-[75vh] flex-col items-center justify-center gap-6">
+      <div className="app-page flex min-h-[75vh] flex-col items-center justify-center gap-6">
         <div className="h-14 w-14 animate-spin rounded-full border-4 border-violet-500/20 border-t-violet-500" />
 
         <div className="text-center">
@@ -65,10 +74,12 @@ function Material() {
   // Error state
   if (error) {
     return (
-      <div className="flex min-h-[75vh] items-center justify-center px-6">
+      <div className="app-page flex min-h-[75vh] items-center justify-center px-6">
         <div className="w-full max-w-md rounded-2xl border border-white/10 bg-white/[0.03] p-8 text-center">
 
-          <div className="mb-5 text-4xl text-red-400">!</div>
+          <div className="mb-5 flex justify-center text-red-400">
+            <WarningCircle size={36} aria-hidden="true" />
+          </div>
 
           <h2 className="text-2xl font-bold">
             Unable to load materials
@@ -103,7 +114,7 @@ function Material() {
   const flashcards = material.flashcards || [];
 
   return (
-    <div className="min-h-screen bg-[#070710] px-5 py-12 text-white sm:px-8">
+    <div className="app-page min-h-screen px-5 py-12 sm:px-8">
 
       <div className="mx-auto max-w-5xl">
 
@@ -113,13 +124,15 @@ function Material() {
           <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
             <Link
               to="/videos"
-              className="text-sm text-gray-400 transition hover:text-violet-400"
+              className="inline-flex items-center gap-2 text-sm text-gray-400 transition hover:text-violet-400"
             >
-              ← Back to All Videos
+              <ArrowLeft size={16} aria-hidden="true" />
+              Back to All Videos
             </Link>
 
-            <span className="rounded-full border border-violet-500/20 bg-violet-500/10 px-4 py-2 text-xs font-medium text-violet-300">
-              ✦ AI Generated Materials
+            <span className="inline-flex items-center gap-2 rounded-full border border-violet-500/20 bg-violet-500/10 px-4 py-2 text-xs font-medium text-violet-300">
+              <Sparkle size={14} aria-hidden="true" />
+              AI Generated Materials
             </span>
           </div>
 
@@ -138,7 +151,7 @@ function Material() {
 
           <div className="mb-5 flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-500/10 text-xl text-violet-400">
-              ✦
+              <Sparkle size={20} aria-hidden="true" />
             </div>
 
             <div>
@@ -163,7 +176,7 @@ function Material() {
           <div className="mb-5 flex items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/10 text-xl text-blue-400">
-                ▤
+                <NotePencil size={20} aria-hidden="true" />
               </div>
 
               <div>
@@ -234,7 +247,7 @@ function Material() {
 
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-fuchsia-500/10 text-xl text-fuchsia-400">
-                ▣
+                <Cards size={20} aria-hidden="true" />
               </div>
 
               <div>
@@ -302,7 +315,7 @@ function Material() {
           <div className="absolute -right-10 -top-10 h-48 w-48 rounded-full bg-violet-500/20 blur-[80px]" />
 
           <div className="relative">
-            <span className="text-3xl">⚡</span>
+            <Lightning size={28} aria-hidden="true" />
 
             <h2 className="mt-4 text-2xl font-bold sm:text-3xl">
               Ready to test your knowledge?
@@ -315,9 +328,10 @@ function Material() {
 
             <Link
               to={`/materials/${videoId}/quiz`}
-              className="mt-8 inline-block rounded-xl bg-white px-8 py-4 text-sm font-bold text-violet-950 transition hover:scale-105 hover:bg-violet-100"
+              className="mt-8 inline-flex items-center gap-2 rounded-xl bg-white px-8 py-4 text-sm font-bold text-violet-950 transition hover:scale-105 hover:bg-violet-100"
             >
-              Start Learning Quiz →
+              Start Learning Quiz
+              <ArrowRight size={16} aria-hidden="true" />
             </Link>
           </div>
 

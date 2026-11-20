@@ -1,6 +1,17 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import {
+  ArrowCounterClockwise,
+  ArrowLeft,
+  ArrowRight,
+  Books,
+  Check,
+  Target,
+  Trophy,
+  X,
+} from "@phosphor-icons/react";
 import { getMaterialById } from "../services/material.service.js";
+import { submitQuizScore } from "../services/auth.service.js";
 
 const getCorrectAnswer = (question) =>
   question.options?.[question.correctAnswerIndex];
@@ -12,6 +23,8 @@ function Quiz() {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState({});
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -64,9 +77,23 @@ function Quiz() {
     ? Math.round((score / questions.length) * 100)
     : 0;
 
+  const handleSubmitQuiz = async () => {
+    setIsSubmitting(true);
+    setSubmitError("");
+
+    try {
+      await submitQuizScore(percentage);
+      setSubmitted(true);
+    } catch (error) {
+      setSubmitError(error.message || "Unable to submit your quiz.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   // Select an answer
   const handleAnswer = (option) => {
-    if (submitted) return;
+    if (submitted || isSubmitting) return;
 
     setAnswers((prev) => ({
       ...prev,
@@ -79,12 +106,13 @@ function Quiz() {
     setAnswers({});
     setCurrentQuestion(0);
     setSubmitted(false);
+    setSubmitError("");
   };
 
   // Loading screen
   if (loading) {
     return (
-      <div className="flex min-h-[75vh] flex-col items-center justify-center gap-5">
+      <div className="app-page flex min-h-[75vh] flex-col items-center justify-center gap-5">
         <div className="h-14 w-14 animate-spin rounded-full border-4 border-violet-500/20 border-t-violet-500" />
 
         <h2 className="text-lg font-semibold text-white">
@@ -101,7 +129,7 @@ function Quiz() {
   // Error screen
   if (error) {
     return (
-      <div className="flex min-h-[75vh] items-center justify-center px-6">
+      <div className="app-page flex min-h-[75vh] items-center justify-center px-6">
         <div className="max-w-md rounded-2xl border border-white/10 bg-white/[0.03] p-8 text-center">
           <h2 className="text-2xl font-bold text-white">
             Unable to load quiz
@@ -125,7 +153,7 @@ function Quiz() {
   // No questions available
   if (!questions.length) {
     return (
-      <div className="flex min-h-[75vh] items-center justify-center px-6">
+      <div className="app-page flex min-h-[75vh] items-center justify-center px-6">
         <div className="max-w-md rounded-2xl border border-white/10 bg-white/[0.03] p-8 text-center">
           <h2 className="text-2xl font-bold">
             No Quiz Available
@@ -149,7 +177,7 @@ function Quiz() {
   // RESULT SCREEN
   if (submitted) {
     return (
-      <div className="min-h-[75vh] px-5 py-16 text-white sm:px-8">
+      <div className="app-page min-h-[75vh] px-5 py-16 sm:px-8">
         <div className="mx-auto max-w-2xl">
 
           <div className="relative overflow-hidden rounded-3xl border border-violet-500/20 bg-gradient-to-br from-violet-950/80 via-[#15112b] to-indigo-950/80 p-8 text-center sm:p-12">
@@ -159,7 +187,13 @@ function Quiz() {
             <div className="relative">
 
               <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-violet-500/15 text-4xl">
-                {percentage >= 80 ? "🏆" : percentage >= 50 ? "🎯" : "📚"}
+                {percentage >= 80 ? (
+                  <Trophy size={36} aria-hidden="true" />
+                ) : percentage >= 50 ? (
+                  <Target size={36} aria-hidden="true" />
+                ) : (
+                  <Books size={36} aria-hidden="true" />
+                )}
               </div>
 
               <p className="mt-7 text-sm font-semibold uppercase tracking-[0.25em] text-violet-300">
@@ -224,9 +258,10 @@ function Quiz() {
 
                 <button
                   onClick={handleRetry}
-                  className="rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 px-7 py-3.5 text-sm font-semibold transition hover:scale-105"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 px-7 py-3.5 text-sm font-semibold transition hover:scale-105"
                 >
-                  Retry Quiz ↻
+                  <ArrowCounterClockwise size={16} aria-hidden="true" />
+                  Retry Quiz
                 </button>
 
                 <Link
@@ -301,7 +336,7 @@ function Quiz() {
   const progress = ((currentQuestion + 1) / questions.length) * 100;
 
   return (
-    <div className="min-h-[80vh] px-5 py-14 text-white sm:px-8">
+    <div className="app-page min-h-[80vh] px-5 py-14 sm:px-8">
 
       <div className="mx-auto max-w-3xl">
 
@@ -320,9 +355,10 @@ function Quiz() {
 
           <Link
             to={`/materials/${videoId}`}
-            className="text-sm text-gray-400 transition hover:text-white"
+            className="inline-flex items-center gap-1 text-sm text-gray-400 transition hover:text-white"
           >
-            Exit Quiz ✕
+            Exit Quiz
+            <X size={16} aria-hidden="true" />
           </Link>
 
         </div>
@@ -375,8 +411,9 @@ function Quiz() {
               return (
                 <button
                   key={index}
+                  disabled={isSubmitting}
                   onClick={() => handleAnswer(option)}
-                  className={`flex w-full items-center gap-4 rounded-xl border p-4 text-left transition-all duration-200 ${
+                  className={`flex w-full items-center gap-4 rounded-xl border p-4 text-left transition-all duration-200 disabled:cursor-not-allowed ${
                     isSelected
                       ? "border-violet-500 bg-violet-500/10"
                       : "border-white/10 bg-white/[0.02] hover:border-violet-500/40 hover:bg-white/[0.05]"
@@ -402,7 +439,7 @@ function Quiz() {
 
                   {isSelected && (
                     <span className="ml-auto text-violet-400">
-                      ✓
+                      <Check size={18} aria-hidden="true" />
                     </span>
                   )}
                 </button>
@@ -412,29 +449,46 @@ function Quiz() {
           </div>
 
           {/* Navigation */}
+          {submitError && (
+            <p role="alert" className="mb-4 text-sm text-red-800">
+              {submitError}
+            </p>
+          )}
+
           <div className="mt-10 flex items-center justify-between gap-3 border-t border-white/10 pt-7">
 
             <button
-              disabled={currentQuestion === 0}
+              disabled={currentQuestion === 0 || isSubmitting}
               onClick={() => setCurrentQuestion((prev) => prev - 1)}
-              className="rounded-xl border border-white/10 px-5 py-3 text-sm font-medium transition hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-30"
+              className="inline-flex items-center gap-2 rounded-xl border border-white/10 px-5 py-3 text-sm font-medium transition hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-30"
             >
-              ← Previous
+              <ArrowLeft size={16} aria-hidden="true" />
+              Previous
             </button>
 
             {currentQuestion < questions.length - 1 ? (
               <button
+                disabled={isSubmitting}
                 onClick={() => setCurrentQuestion((prev) => prev + 1)}
-                className="rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 px-6 py-3 text-sm font-semibold transition hover:scale-105"
+                className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 px-6 py-3 text-sm font-semibold transition hover:scale-105 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                Next Question →
+                Next Question
+                <ArrowRight size={16} aria-hidden="true" />
               </button>
             ) : (
               <button
-                onClick={() => setSubmitted(true)}
-                className="rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 px-6 py-3 text-sm font-semibold transition hover:scale-105"
+                onClick={handleSubmitQuiz}
+                disabled={isSubmitting}
+                className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 px-6 py-3 text-sm font-semibold transition hover:scale-105 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                Submit Quiz ✓
+                {isSubmitting ? (
+                  "Saving..."
+                ) : (
+                  <>
+                    Submit Quiz
+                    <Check size={16} aria-hidden="true" />
+                  </>
+                )}
               </button>
             )}
 

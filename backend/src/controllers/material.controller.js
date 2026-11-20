@@ -1,4 +1,5 @@
 import Material from "../models/material.model.js";
+import { User } from "../models/user.model.js";
 import { extractYouTubeVideoId } from "../utils/ytUrlValidator.util.js";
 import { getTranscript } from "../services/transcript.service.js";
 import { generateLearningMaterials } from "../services/ai.service.js";
@@ -8,6 +9,7 @@ import asyncHandler from "../utils/asyncHandler.util.js";
 
 
 export const generateMaterials = asyncHandler(async (req, res) => {
+    const userId = req.auth.userId;
 
     // STEP 1: Get YouTube URL
     const { youtubeUrl } = req.body;
@@ -26,7 +28,7 @@ export const generateMaterials = asyncHandler(async (req, res) => {
 
 
     // STEP 3: Check MongoDB for existing materials
-    const existingMaterial = await Material.findOne({ videoId });
+    const existingMaterial = await Material.findOne({ videoId, user: userId });
 
     if (existingMaterial) {
         return res.status(200).json({
@@ -57,6 +59,7 @@ export const generateMaterials = asyncHandler(async (req, res) => {
     const {
         title,
         summary,
+        genre,
         notes,
         flashcards,
         quiz
@@ -67,6 +70,8 @@ export const generateMaterials = asyncHandler(async (req, res) => {
         !summary.trim() ||
         typeof title !== "string" ||
         !title.trim() ||
+        typeof genre !== "string" ||
+        !genre.trim() ||
         !Array.isArray(notes) ||
         !Array.isArray(flashcards) ||
         !Array.isArray(quiz)
@@ -83,10 +88,12 @@ export const generateMaterials = asyncHandler(async (req, res) => {
 
     try {
         savedMaterial = await Material.create({
+            user: userId,
             videoId,
             videoUrl: youtubeUrl,
             title,
             summary,
+            genre,
             notes,
             flashcards,
             quiz
@@ -96,7 +103,7 @@ export const generateMaterials = asyncHandler(async (req, res) => {
         // Handle simultaneous requests for the same video.
         // Another request may have saved it first.
         if (error.code === 11000) {
-            const cachedMaterial = await Material.findOne({ videoId });
+            const cachedMaterial = await Material.findOne({ videoId, user: userId });
 
             if (cachedMaterial) {
                 return res.status(200).json({
@@ -111,6 +118,16 @@ export const generateMaterials = asyncHandler(async (req, res) => {
         throw error;
     }
 
+    const userUpdate = await User.updateOne(
+        { _id: userId },
+        { $inc: { "activity.totalMaterialsGenerated": 1 } }
+    );
+
+    if (userUpdate.matchedCount !== 1) {
+        await Material.deleteOne({ _id: savedMaterial._id, user: userId });
+        throw new ApiError(404, "User not found");
+    }
+
 
     // STEP 8: Return response
     return res.status(201).json({
@@ -123,19 +140,20 @@ export const generateMaterials = asyncHandler(async (req, res) => {
 });
 
 export const getAllMaterials = asyncHandler(async (req, res) => {
+    const userId = req.auth.userId;
     const page = Math.max(1, parseInt(req.query.page) || 1);
     const limit = Math.min(50, Math.max(1, parseInt(req.query.limit) || 10));
 
     const skip = (page - 1) * limit;
 
     const [materials, totalMaterials] = await Promise.all([
-        Material.find()
-            .select("videoId title")
+        Material.find({ user: userId })
+            .select("videoId title genre")
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(limit),
 
-        Material.countDocuments()
+        Material.countDocuments({ user: userId })
     ]);
 
     return res.status(200).json({
@@ -151,9 +169,10 @@ export const getAllMaterials = asyncHandler(async (req, res) => {
 });
 
 export const getMaterialByVideoId = asyncHandler(async (req, res) => {
+    const userId = req.auth.userId;
     const { videoId } = req.params;
 
-    const material = await Material.findOne({ videoId });
+    const material = await Material.findOne({ videoId, user: userId });
 
     if (!material) {
         throw new ApiError(404, "Learning material not found");

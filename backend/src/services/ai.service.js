@@ -1,4 +1,5 @@
 import { GoogleGenAI } from "@google/genai";
+import { genreOptions } from "../models/material.model.js";
 
 export const generateLearningMaterials = async (transcript) => {
     if (!transcript || typeof transcript !== "string" || !transcript.trim()) {
@@ -41,23 +42,28 @@ Write a concise but informative overview of the video.
 2. TITLE:
 Provide a clear , concise, and brief title for the learning materials.
 
-3. NOTES:
+3. GENRE:
+Choose exactly one genre from this list, based on the transcript:
+${genreOptions.map((genre) => `- ${genre}`).join("\n")}
+
+4. NOTES:
 Create organized (some detailed point if needed for long transcripts) notes covering the main concepts.
 Each note must have a title and explanatory content.
 
-4. FLASHCARDS:
+5. FLASHCARDS:
 Create useful question-and-answer flashcards for revision.
 
-5. QUIZ:
+6. QUIZ:
 Create multiple-choice questions.
 Each question must have four options, one correct answer,
 and a short explanation.
 
 Return JSON using exactly this structure:
 
-{       
+{
     "title": "Title text",
     "summary": "Summary text",
+    "genre": "One exact genre from the provided list",
     "notes": [
         {
             "title": "Topic title",
@@ -111,7 +117,9 @@ Return JSON using exactly this structure:
         }
 
         if (
+            typeof materials.title !== "string" ||
             typeof materials.summary !== "string" ||
+            !genreOptions.includes(materials.genre) ||
             !Array.isArray(materials.notes) ||
             !Array.isArray(materials.flashcards) ||
             !Array.isArray(materials.quiz)
